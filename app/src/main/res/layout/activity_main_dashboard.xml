@@ -13,8 +13,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:title="Campus Share &amp; Found"
-            app:titleCentered="true"
-            style="@style/Widget.Material3.Toolbar.Surface" />
+            app:titleCentered="true" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -37,6 +36,7 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="16dp" />
 
+            <!-- Renamed Post Lost Item to Post Your Need -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardPostLost"
                 android:layout_width="match_parent"
@@ -55,7 +55,7 @@
                     <ImageView
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:src="@android:drawable/ic_menu_search"
+                        android:src="@android:drawable/ic_menu_edit"
                         app:tint="@color/purple_500" />
 
                     <LinearLayout
@@ -68,14 +68,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Post Lost Item"
+                            android:text="Post Your Need"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Lost something? Report it here."
+                            android:text="Share, report lost or found items."
                             android:textSize="12sp" />
                     </LinearLayout>
                 </LinearLayout>
@@ -125,6 +125,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Renamed Share Items to View Requests -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardShareItems"
                 android:layout_width="match_parent"
@@ -156,14 +157,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Share Items"
+                            android:text="View Requests"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Borrow or lend laptops, books, etc."
+                            android:text="Help others or borrow needed items."
                             android:textSize="12sp" />
                     </LinearLayout>
                 </LinearLayout>
@@ -172,7 +173,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Notifications Demo"
+                android:text="System Status"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp" />
@@ -181,29 +182,8 @@
                 android:id="@+id/btnBasicNotification"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Simple Notification"
+                android:text="Test Notification Service"
                 android:layout_marginBottom="8dp" />
-
-            <Button
-                android:id="@+id/btnHeadsUpNotification"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Heads-Up (High Priority)"
-                android:layout_marginBottom="8dp" />
-
-            <Button
-                android:id="@+id/btnProgressNotification"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Progress Notification"
-                android:layout_marginBottom="8dp" />
-
-            <Button
-                android:id="@+id/btnDialogToast"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Toast &amp; Dialog"
-                android:layout_marginBottom="16dp" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

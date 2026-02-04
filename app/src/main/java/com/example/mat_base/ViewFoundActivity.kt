@@ -1,6 +1,7 @@
 package com.example.mat_base
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -31,6 +32,8 @@ class ViewFoundActivity : AppCompatActivity() {
             MaterialItem("8", "Scientific Calculator", "Casio calculator found in Lecture Hall 4.", "Prof. Smith", ItemType.FOUND, "Stationery", "3h ago")
         )
 
-        recyclerView.adapter = MaterialSharingActivity.MaterialAdapter(foundItems)
+        recyclerView.adapter = MaterialSharingActivity.MaterialAdapter(foundItems) { item ->
+            Toast.makeText(this, "Details for: ${item.title}", Toast.LENGTH_SHORT).show()
+        }
     }
 }
