@@ -50,16 +50,16 @@ class DashboardActivity : AppCompatActivity() {
     }
 
     private fun showPostNeedDialog() {
-        val options = arrayOf("1. Request to Share", "2. Post the Lost item", "3. Post the found item")
+        val options = arrayOf("1. Share Request", "2. Report Lost Item", "3. Report Found Item")
         
         AlertDialog.Builder(this)
             .setTitle("Post Your Need")
             .setItems(options) { _, which ->
                 val intent = Intent(this, PostLostActivity::class.java)
                 when (which) {
-                    0 -> intent.putExtra("POST_TYPE", "Request to Share")
-                    1 -> intent.putExtra("POST_TYPE", "Post Lost Item")
-                    2 -> intent.putExtra("POST_TYPE", "Post Found Item")
+                    0 -> intent.putExtra("POST_TYPE", "Share Request")
+                    1 -> intent.putExtra("POST_TYPE", "Report Lost Item")
+                    2 -> intent.putExtra("POST_TYPE", "Report Found Item")
                 }
                 startActivity(intent)
             }

@@ -1,21 +1,20 @@
 package com.example.mat_base
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.example.mat_base.ui.models.ItemType
+import com.example.mat_base.ui.models.MaterialItem
+import com.example.mat_base.ui.models.MaterialRepository
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+import java.util.UUID
 
 class PostLostActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,19 +27,46 @@ class PostLostActivity : AppCompatActivity() {
         toolbar.setNavigationOnClickListener { finish() }
 
         val btnSubmit = findViewById<MaterialButton>(R.id.btnSubmit)
-        val etTitle = findViewById<TextInputEditText>(R.id.etItemName) // Assuming ID from layout
+        val etTitle = findViewById<TextInputEditText>(R.id.etItemName)
+        val etDesc = findViewById<TextInputEditText>(R.id.etDescription)
 
         btnSubmit.setOnClickListener {
-            showConfirmationDialog(postType)
+            val title = etTitle.text.toString()
+            val desc = etDesc.text.toString()
+
+            if (title.isBlank()) {
+                etTitle.error = "Please enter a title"
+                return@setOnClickListener
+            }
+
+            showConfirmationDialog(postType, title, desc)
         }
     }
 
-    private fun showConfirmationDialog(type: String) {
+    private fun showConfirmationDialog(type: String, title: String, desc: String) {
         AlertDialog.Builder(this)
             .setTitle("Confirm Submission")
             .setMessage("Are you sure you want to post this $type?")
             .setPositiveButton("Post") { _, _ ->
-                // Simulate success
+                val itemType = when (type) {
+                    "Share Request" -> ItemType.SHARE
+                    "Report Lost Item" -> ItemType.LOST
+                    "Report Found Item" -> ItemType.FOUND
+                    else -> ItemType.SHARE
+                }
+
+                val newItem = MaterialItem(
+                    id = UUID.randomUUID().toString(),
+                    title = title,
+                    description = desc,
+                    ownerName = "Current User",
+                    type = itemType,
+                    category = "General",
+                    timestamp = "Just now"
+                )
+
+                MaterialRepository.addItem(newItem)
+
                 Toast.makeText(this, "$type submitted!", Toast.LENGTH_SHORT).show()
                 sendSuccessNotification(type)
                 finish()

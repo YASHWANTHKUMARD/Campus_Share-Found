@@ -16,9 +16,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mat_base.ui.models.ItemType
 import com.example.mat_base.ui.models.MaterialItem
+import com.example.mat_base.ui.models.MaterialRepository
 import com.google.android.material.chip.Chip
 
 class MaterialSharingActivity : AppCompatActivity() {
+    
+    private lateinit var adapter: MaterialAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.material_sharing)
@@ -26,16 +30,16 @@ class MaterialSharingActivity : AppCompatActivity() {
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        val dummyItems = listOf(
-            MaterialItem("1", "Dell XPS 13", "Need a laptop for the weekend for a project.", "John Doe", ItemType.SHARE, "Electronics", "2h ago"),
-            MaterialItem("2", "Scientific Calculator", "Found near the library.", "Jane Smith", ItemType.FOUND, "Stationery", "5h ago"),
-            MaterialItem("3", "Blue Notebook", "Lost my math notes. Please help!", "Alice Brown", ItemType.LOST, "Stationery", "1d ago"),
-            MaterialItem("4", "Lab Coat", "Extra lab coat available for borrowing.", "Bob Wilson", ItemType.SHARE, "Clothing", "3d ago")
-        )
-
-        recyclerView.adapter = MaterialAdapter(dummyItems) { item ->
+        adapter = MaterialAdapter(MaterialRepository.getItems()) { item ->
             handleItemClick(item)
         }
+        recyclerView.adapter = adapter
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh items when returning to the screen
+        adapter.updateItems(MaterialRepository.getItems())
     }
 
     private fun handleItemClick(item: MaterialItem) {
@@ -49,6 +53,12 @@ class MaterialSharingActivity : AppCompatActivity() {
             .setTitle(item.title)
             .setMessage("Do you want to $action for this item?")
             .setPositiveButton("Confirm") { _, _ ->
+                // Update the item's status
+                if (item.type == ItemType.LOST) {
+                    MaterialRepository.updateItemType(item.id, ItemType.FOUND)
+                    adapter.updateItems(MaterialRepository.getItems()) // Refresh the list
+                }
+
                 Toast.makeText(this, "Action Confirmed!", Toast.LENGTH_SHORT).show()
                 sendActionNotification(item, action)
             }
@@ -79,42 +89,47 @@ class MaterialSharingActivity : AppCompatActivity() {
             }
         }
     }
+}
 
-    class MaterialAdapter(
-        private val items: List<MaterialItem>,
-        private val onItemClick: (MaterialItem) -> Unit
-    ) : RecyclerView.Adapter<MaterialAdapter.ViewHolder>() {
-        
-        class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val title: TextView = view.findViewById(R.id.itemTitle)
-            val desc: TextView = view.findViewById(R.id.itemDescription)
-            val owner: TextView = view.findViewById(R.id.itemOwner)
-            val time: TextView = view.findViewById(R.id.itemTimestamp)
-            val badge: Chip = view.findViewById(R.id.itemTypeBadge)
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_material, parent, false)
-            return ViewHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val item = items[position]
-            holder.title.text = item.title
-            holder.desc.text = item.description
-            holder.owner.text = "By: ${item.ownerName}"
-            holder.time.text = item.timestamp
-            holder.badge.text = item.type.name
-            
-            when(item.type) {
-                ItemType.SHARE -> holder.badge.setChipBackgroundColorResource(android.R.color.holo_green_dark)
-                ItemType.LOST -> holder.badge.setChipBackgroundColorResource(android.R.color.holo_red_dark)
-                ItemType.FOUND -> holder.badge.setChipBackgroundColorResource(android.R.color.holo_blue_dark)
-            }
-
-            holder.itemView.setOnClickListener { onItemClick(item) }
-        }
-
-        override fun getItemCount() = items.size
+class MaterialAdapter(
+    private var items: List<MaterialItem>,
+    private val onItemClick: (MaterialItem) -> Unit
+) : RecyclerView.Adapter<MaterialAdapter.ViewHolder>() {
+    
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val title: TextView = view.findViewById(R.id.itemTitle)
+        val desc: TextView = view.findViewById(R.id.itemDescription)
+        val owner: TextView = view.findViewById(R.id.itemOwner)
+        val time: TextView = view.findViewById(R.id.itemTimestamp)
+        val badge: Chip = view.findViewById(R.id.itemTypeBadge)
     }
+
+    fun updateItems(newItems: List<MaterialItem>) {
+        this.items = newItems
+        notifyDataSetChanged()
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_material, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = items[position]
+        holder.title.text = item.title
+        holder.desc.text = item.description
+        holder.owner.text = "By: ${item.ownerName}"
+        holder.time.text = item.timestamp
+        holder.badge.text = item.type.name
+        
+        when(item.type) {
+            ItemType.SHARE -> holder.badge.setChipBackgroundColorResource(android.R.color.holo_green_dark)
+            ItemType.LOST -> holder.badge.setChipBackgroundColorResource(android.R.color.holo_red_dark)
+            ItemType.FOUND -> holder.badge.setChipBackgroundColorResource(android.R.color.holo_blue_dark)
+        }
+
+        holder.itemView.setOnClickListener { onItemClick(item) }
+    }
+
+    override fun getItemCount() = items.size
 }
