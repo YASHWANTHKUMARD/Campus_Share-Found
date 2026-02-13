@@ -1,186 +1,188 @@
-# 📱 Campus Share & Found – Android Application
+📱 Campus Share & Found – MAT-BASE
 
-Campus Share & Found is an Android application designed for campus communities to **share items, report lost items, and view found items** in a simple and efficient way. The app uses core Android components and follows a clean, activity-based workflow.
+A Material Design-based Android application that enables users to post, browse, and manage Lost, Found, and Share requests within a campus community.
 
----
+🚀 Use Cases & Application Workflow
+🔹 Use Case 1: App Launch & Navigation (The Entry Point)
+📌 Workflow
 
-## 🚀 Features
+User opens the app → DashboardActivity is launched.
 
-* Post lost, found, or shareable items
-* View items reported as **Found**
-* Browse and interact with shared/lost/found items
-* Confirmation dialogs for user actions
-* Notifications for important actions
-* RecyclerView-based efficient item listing
+The dashboard displays three main options:
 
----
+Post Your Need
 
-## 🧩 Core Android Concepts Used
+View Found Items
 
-### 1. Activity
+View Requests
 
-**What it is:**
-An Activity represents a single screen with a user interface. An Android app is typically made up of multiple activities.
+🛠 Concepts Used
 
-**How it’s used in this app:**
+Activity
+DashboardActivity acts as the UI controller.
 
-* **DashboardActivity**
-  The main entry point of the app. Displays three primary options:
+Intents
+Explicit Intents are used to navigate between screens (e.g., ViewFoundActivity).
 
-  * Post Your Need
-  * View Found Items
-  * Share Items
+Material Design
+MaterialCardView creates a modern and interactive dashboard interface.
 
-* **MaterialSharingActivity**
-  Displays a list of items that are available for sharing or reported as lost/found.
+🔹 Use Case 2: Posting a New Request (Lost, Found, or Share)
+📌 Workflow
 
-* **PostLostActivity**
-  Provides a form for users to post new items (Lost, Found, or Share requests).
+User taps "Post Your Need".
 
-* **ViewFoundActivity**
-  Dedicated screen to display only items marked as **FOUND**.
+An AlertDialog appears to select:
 
----
+Share Request
 
-### 2. RecyclerView
+Report Lost
 
-**What it is:**
-RecyclerView is an advanced and efficient widget used to display large lists of data by recycling item views.
+Report Found
 
-**How it’s used in this app:**
+User is navigated to PostLostActivity.
 
-* Used in **MaterialSharingActivity** and **ViewFoundActivity**
-* Displays lists of `MaterialItems`
-* A custom adapter (`MaterialAdapter`) binds item data to the UI
+User enters Title and Description and clicks Submit.
 
----
+Confirmation dialog appears.
 
-### 3. Notifications
+On clicking Post, data is saved and user returns to Dashboard.
 
-**What it is:**
-Notifications are messages shown outside the app’s UI to inform users about events or actions.
+A success notification is displayed.
 
-**How it’s used in this app:**
+🛠 Concepts Used
 
-* When a user performs actions like **Accept Request**, a notification is triggered
-* `sendActionNotification()` handles notification creation
-* `DashboardActivity`:
+AlertDialog
+Captures user selection without opening a new screen.
 
-  * Requests `POST_NOTIFICATIONS` permission
-  * Creates a `NotificationChannel` (required for Android 8.0+)
+Data Passing (Intent Extras)
+POST_TYPE is passed using Intent.putExtra().
 
----
+Repository Pattern
+MaterialRepository.addItem() stores data globally.
 
-### 4. Intent
+NotificationManager
+Displays confirmation notification after successful post.
 
-**What it is:**
-An Intent is a messaging object used to request an action from another app component, such as launching an Activity.
+🔹 Use Case 3: Browsing All Requests (The Community Feed)
+📌 Workflow
 
-**How it’s used in this app:**
+User taps "View Requests" → launches MaterialSharingActivity.
 
-* Navigation between activities from the Dashboard
-* Example:
+App fetches all items from the repository.
 
-  ```kotlin
-  startActivity(Intent(this, ViewFoundActivity::class.java))
-  ```
+Items are displayed in a scrollable list.
 
----
+🛠 Concepts Used
 
-### 5. AlertDialog
+RecyclerView
+Efficiently displays long lists.
 
-**What it is:**
-An AlertDialog prompts the user to confirm an action or make a decision.
+Adapter & ViewHolder Pattern
+MaterialAdapter binds data to UI components.
+ViewHolder holds references to UI elements (Title, Badge, etc.).
 
-**How it’s used in this app:**
+Dynamic UI with Chips
+Badge color changes based on ItemType:
 
-* In **MaterialSharingActivity**, tapping an item opens a confirmation dialog
-* Confirms actions such as **Accept Request** before proceeding
+🟢 Green → Share
 
----
+🔴 Red → Lost
 
-## 🔄 Application Workflow
+🔵 Blue → Found
 
-### 1. Launch
+🔹 Use Case 4: Updating Status (Lost → Found Loop)
+📌 Workflow
 
-* App starts with **DashboardActivity**
-* User sees three main options:
+User sees an item marked as LOST.
 
-  * **Post Your Need**
-    Opens a dialog to choose:
+User taps the item.
 
-    * Request to Share
-    * Post Lost Item
-    * Post Found Item
-      Then navigates to **PostLostActivity**
+A dialog asks:
+"Do you want to mark this item as FOUND?"
 
-  * **View Found Items**
-    Opens **ViewFoundActivity** showing all FOUND items
+On confirmation:
 
-  * **Share Items**
-    Opens **MaterialSharingActivity** with mixed item listings
+Badge changes from 🔴 LOST → 🔵 FOUND
 
----
+Notification is triggered.
 
-### 2. Viewing Items
+🛠 Concepts Used
 
-* Items are displayed using **RecyclerView**
-* Smooth scrolling and efficient memory usage
+Mutable Data State
+MaterialRepository.updateItemType() updates the item.
 
----
+Observer-like Pattern
+adapter.notifyDataSetChanged() refreshes UI instantly.
 
-### 3. Interacting with Items
+Activity Lifecycle Awareness
+onResume() ensures updated data is displayed when returning to the screen.
 
-* Clicking an item in **MaterialSharingActivity**:
+🔹 Use Case 5: Specialized Browsing (Found Items Only)
+📌 Workflow
 
-  * Shows an **AlertDialog** for confirmation
-  * On confirmation:
+User taps "View Found Items".
 
-    * Displays a **Toast** message
-    * Sends a **Notification** to the user
+ViewFoundActivity opens.
 
----
+Only items marked as FOUND are displayed.
 
-### 4. Posting Items
+🛠 Concepts Used
 
-* **PostLostActivity** allows users to:
+Data Filtering (Kotlin)
 
-  * Add new Lost items
-  * Add Found items
-  * Add items for Sharing
+repositoryList.filter { it.type == ItemType.FOUND }
 
----
 
-## 🏫 Use Case
+Code Reusability
+Reuses:
 
-This application provides a simple yet effective platform for campus communities to:
+MaterialAdapter
 
-* Share unused items
-* Report lost belongings
-* Help others find missing items
+item_material.xml layout
+Demonstrates modular and maintainable architecture.
 
-By leveraging fundamental Android components, the app ensures clarity, usability, and smooth collaboration between users.
+🏗 Core Architecture Overview
+Concept	Purpose in MAT-BASE
+Activities	Separate screens for Dashboard, Posting, and Viewing
+MaterialRepository	Single Source of Truth for consistent data
+RecyclerView	Efficient scrolling for large data sets
+Notifications	Background feedback even when app is minimized
+Intents	Navigation glue between different screens
+📌 Key Features
 
----
+Material Design UI
 
-## 🛠 Tech Stack
+Repository Pattern Architecture
 
-* Language: **Kotlin**
-* UI: **XML Layouts**
-* Architecture: **Activity-based**
-* Components: RecyclerView, Notifications, Intents, AlertDialog
+Dynamic Badge System
 
----
+Notification Integration
 
-## 📌 Future Enhancements (Optional)
+Efficient RecyclerView Implementation
 
-* Firebase / Backend integration
-* User authentication
-* Search & filter functionality
-* Real-time notifications
-* MVVM architecture
+Clean Activity Navigation using Explicit Intents
 
----
+🛠 Tech Stack
 
-**Author:** Yashwanth Kumar D
-**Project Type:** Android Mobile Application
+Kotlin
+
+Android SDK
+
+Material Design Components
+
+RecyclerView
+
+NotificationManager
+
+📈 Future Improvements
+
+Firebase Database Integration
+
+User Authentication
+
+Real-time updates
+
+Search & Filter functionality
+
+Image upload support
